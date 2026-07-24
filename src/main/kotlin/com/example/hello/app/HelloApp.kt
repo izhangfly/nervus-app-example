@@ -14,7 +14,7 @@ import com.nervus.sdk.ui.attachComposeDesktop
 import kotlinx.coroutines.launch
 
 class HelloApp : NervusApp(
-    config = ComponentConfig(componentId = "hello-app")
+    config = ComponentConfig(componentId = "hello_app")
 ) {
     override val requiredInterfaces = listOf(
         InterfaceRequirement(id = "com.example.hello.Greeter"),

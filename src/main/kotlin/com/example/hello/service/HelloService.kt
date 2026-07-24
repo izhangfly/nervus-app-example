@@ -6,7 +6,7 @@ import com.nervus.sdk.component.NervusService
 import com.nervus.sdk.component.ProvidedInterface
 
 class HelloService : NervusService(
-    config = ComponentConfig(componentId = "hello-service")
+    config = ComponentConfig(componentId = "hello_service")
 ) {
     private val greeterImpl = object : Greeter {
         override suspend fun greet(name: String): String {

@@ -33,19 +33,19 @@ nspkg {
     versionCode = 1L
     minNervusApi = 1
     targetNervusApi = 1
-    supportedAbis = listOf("jvm")
+    supportedAbis = listOf("linux-x86_64")
 
     runtimeDeps.minJavaRelease = 21
 
-    components.app("hello-app") {
-        entry = "com.example.hello.app.HelloAppKt"
+    components.app("hello_app") {
+        mainClass = "com.example.hello.app.HelloAppKt"
         runtime = "jvm"
-        launchMode = "always-on"
+        launchMode = "manual"
         interfaces = listOf("com.example.hello.Greeter")
     }
 
-    components.service("hello-service") {
-        entry = "com.example.hello.service.HelloServiceKt"
+    components.service("hello_service") {
+        mainClass = "com.example.hello.service.HelloServiceKt"
         runtime = "jvm"
         launchMode = "on-demand"
     }
