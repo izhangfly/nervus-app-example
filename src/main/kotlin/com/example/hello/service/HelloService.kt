@@ -6,11 +6,16 @@ import com.nervus.sdk.component.NervusService
 import com.nervus.sdk.component.ProvidedInterface
 
 class HelloService : NervusService(
-    config = ComponentConfig(componentId = "hello_service")
+    config = ComponentConfig(
+        componentId = "hello_service",
+        socketPath = "/run/nervus/nervud.sock",
+    )
 ) {
     private val greeterImpl = object : Greeter {
         override suspend fun greet(name: String): String {
-            return "Hello, $name!"
+            val reply = "Hello, $name!"
+            logger.info("greet called name=[$name] reply=[$reply]")
+            return reply
         }
     }
 
@@ -31,8 +36,10 @@ class HelloService : NervusService(
         logger.info("HelloService stopping")
     }
 
-    fun main() {
-        start()
-        Runtime.getRuntime().addShutdownHook(Thread { close() })
-    }
+}
+
+fun main() {
+    val service = HelloService()
+    Runtime.getRuntime().addShutdownHook(Thread { service.close() })
+    service.start()
 }

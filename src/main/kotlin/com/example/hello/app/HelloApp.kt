@@ -1,11 +1,15 @@
 package com.example.hello.app
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.hello.Greeter
 import com.nervus.sdk.component.ComponentConfig
 import com.nervus.sdk.component.InterfaceRequirement
@@ -13,8 +17,17 @@ import com.nervus.sdk.component.NervusApp
 import com.nervus.sdk.ui.attachComposeDesktop
 import kotlinx.coroutines.launch
 
+fun main() {
+    val app = HelloApp()
+    Runtime.getRuntime().addShutdownHook(Thread { app.close() })
+    app.start()
+}
+
 class HelloApp : NervusApp(
-    config = ComponentConfig(componentId = "hello_app")
+    config = ComponentConfig(
+        componentId = "hello_app",
+        socketPath = "/run/nervus/nervud.sock",
+    )
 ) {
     override val requiredInterfaces = listOf(
         InterfaceRequirement(id = "com.example.hello.Greeter"),
@@ -70,9 +83,13 @@ fun HelloScreen(greeter: Greeter) {
                         result = ""
                         scope.launch {
                             try {
+                                println("HelloApp: calling greet name=[$name]")
                                 val reply = greeter.greet(name)
+                                println("HelloApp: greet reply=[$reply] len=${reply.length}")
                                 result = reply
                             } catch (e: Exception) {
+                                println("HelloApp: greet error: ${e.message}")
+                                e.printStackTrace()
                                 result = "Error: ${e.message}"
                             } finally {
                                 loading = false
@@ -101,9 +118,7 @@ fun HelloScreen(greeter: Greeter) {
                         ),
                     ) {
                         Text(
-                            text = result,
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.bodyLarge,
+                            text = result
                         )
                     }
                 }

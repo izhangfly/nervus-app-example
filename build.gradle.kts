@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
+    implementation("org.jetbrains.skiko:skiko-awt-runtime-linux-arm64:0.8.18")
     testImplementation(libs.kotlin.test)
 }
 
@@ -33,7 +34,7 @@ nspkg {
     versionCode = 1L
     minNervusApi = 1
     targetNervusApi = 1
-    supportedAbis = listOf("linux-x86_64")
+    supportedAbis = listOf("linux-arm64")
 
     runtimeDeps.minJavaRelease = 21
 
@@ -48,7 +49,12 @@ nspkg {
         mainClass = "com.example.hello.service.HelloServiceKt"
         runtime = "jvm"
         launchMode = "on-demand"
+        exports.register("com.example.hello.Greeter") {
+            visibility = "package"
+        }
     }
+
+    permissions = listOf("perm.service.register.private", "perm.service.register")
 
     signing.keyFile = file("signing/private.pem")
     signing.role = "developer"
