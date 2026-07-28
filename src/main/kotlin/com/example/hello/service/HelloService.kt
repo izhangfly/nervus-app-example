@@ -30,9 +30,11 @@ class HelloService : NervusService(
     override fun onStop() {
         logger.info("HelloService stopping")
     }
+}
 
-    fun main() {
-        start()
-        Runtime.getRuntime().addShutdownHook(Thread { close() })
-    }
+fun main() {
+    val service = HelloService()
+    service.start()
+    Runtime.getRuntime().addShutdownHook(Thread { service.close() })
+    service.awaitTermination()
 }
