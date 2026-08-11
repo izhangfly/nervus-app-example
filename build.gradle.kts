@@ -42,12 +42,10 @@ nspkg {
         runtime = "jvm"
         launchMode = "manual"
         interfaces = listOf("com.example.hello.Greeter")
-    }
-
-    components.service("hello_service") {
-        mainClass = "com.example.hello.service.HelloServiceKt"
-        runtime = "jvm"
-        launchMode = "on-demand"
+        // TODO(provider-toolchain): add exports + provider { fromProto(...) } once
+        // the user-app providergen CLI exists (nervus-ipc issue #xxx).
+        // Until then schemaHash stays ByteArray(0) and RegisterEndpoint will be
+        // rejected by the schema-hash check — app is not deployable as-is.
     }
 
     signing.keyFile = file("signing/private.pem")

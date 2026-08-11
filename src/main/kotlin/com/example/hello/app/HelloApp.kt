@@ -3,23 +3,40 @@ package com.example.hello.app
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.hello.Greeter
 import com.nervus.sdk.component.ComponentConfig
-import com.nervus.sdk.component.InterfaceRequirement
 import com.nervus.sdk.component.NervusApp
+import com.nervus.sdk.component.ProvidedInterface
 import com.nervus.sdk.ui.attachComposeDesktop
 import kotlinx.coroutines.launch
 
 class HelloApp : NervusApp(
     config = ComponentConfig(componentId = "hello_app")
 ) {
-    override val requiredInterfaces = listOf(
-        InterfaceRequirement(id = "com.example.hello.Greeter"),
+    // HelloApp 自己实现 Greeter，不再依赖独立的 hello_service 组件。
+    // app 组件 CanProvideInterfaces() == true（nervud pkgregistry），
+    // 接口与 UI 捆绑在同一进程里，省去跨组件 IPC 往返。
+    //
+    // schemaHash 暂留 ByteArray(0)：用户应用的 provider.binpb / schemas.binpb
+    // 生成工具链尚未实现（需要 nervus-ipc 出通用 providergen CLI）。
+    // 在此之前 RegisterEndpoint 会被内核以 "schema hash does not match" 拒绝，
+    // 本 app 不可部署；等工具链就绪后补上 exports + schemaHash。
+    private val greeterImpl = object : Greeter {
+        override suspend fun greet(name: String): String = "Hello, $name!"
+    }
+
+    override val providedInterfaces = listOf(
+        ProvidedInterface(
+            id = "com.example.hello.Greeter",
+            major = 1,
+            instance = greeterImpl,
+            // TODO(provider-toolchain): populate schemaHash from generated binpb
+        ),
     )
 
+    // 本包内直接 use()，Resolve 到自己提供的 greeterImpl，无需 requiredInterfaces。
     private var greeter: Greeter? = null
 
     override fun onReady() {
